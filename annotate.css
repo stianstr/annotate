@@ -1,0 +1,33 @@
+.annotate-overlay {
+  background: #000;
+  opacity: 0.2;
+}
+.annotate-annotation {
+  border-style: solid;
+  border-color: #08f;
+  border-width: 2px;
+}
+.annotate-comment {
+  background: #e0f0ff;
+  border-style: solid;
+  border-color: #05a;
+  border-width: 2px;
+  border-top: 0;
+  padding: 7px;
+}
+.annotate-close-link {
+  background: #eee;
+  border-style: solid;
+  border-color: #08f;
+  border-width: 2px;
+  border-radius: 5px;
+  font-size: 11px;
+  padding: 3px;
+  height: 12px;
+  width: 12px;
+}
+.annotate-close-link:hover {
+  pointer: cursor;
+  background: #ff0000;
+  color: white;
+}
