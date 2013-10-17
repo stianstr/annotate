@@ -6,7 +6,7 @@
   <script type="text/javascript">
     $(function() {
         var annotate = new Annotate({
-            formId: 'annotateForm',
+            formId: 'annotate-form',
             callback: function(data) {
                 console.log('callback.data: ', data);
             }
@@ -17,8 +17,9 @@
         $('#annotate-cancel').on('click', function() { annotate.cancel(); });
     });
   </script>
+  <link rel="stylesheet" type="text/css" href="../annotate.css"> 
   <style type="text/css">
-   #annotateForm {
+   #annotate-form {
      position: absolute;
      right: 0;
      top: 0;
@@ -37,7 +38,7 @@
     <h1>Sample page - annotate.js</h1>
     <p>Press mouse and draw a rectangle</p>
 
-    <div id="annotateForm">
+    <div id="annotate-form">
         <a id="annotate-start"  href="#">Start</a>
         <a id="annotate-commit" href="#">Commit</a>
         <a id="annotate-cancel" href="#">Cancel</a>

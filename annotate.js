@@ -6,12 +6,7 @@
     self.leftMouseButton = 1;
 
     self.settings = $.extend({
-        overlayColor:           '#000',
-        overlayOpacity:         '.25',
         overlayZIndex:          '9000000',
-        annotationBorderColor:  '#f00',
-        annotationBorderWidth:  3,
-        annotationBorderStyle:  'solid',
         annotationMinimumSize:  10,
         collectHtml:            true,
         formId:                 null,
@@ -61,13 +56,11 @@
 
 
     self.createOverlay = function(container) {
-        self.overlay = $('<div></div>')
+        self.overlay = $('<div class="annotate-overlay"></div>')
         .css({
             position:         'absolute',
             width:            '100%',
             height:           '100%',
-            backgroundColor:  self.settings.overlayColor,
-            opacity:          self.settings.overlayOpacity,
             left:             '0',
             top:              '0',
             zIndex:           self.settings.overlayZIndex,
@@ -82,13 +75,10 @@
 
         self.processLastComment();
         self.currentId++;
-        var container = $('<div id="feedback-' + self.currentId + '" class="feedback-container"></div>');
-        self.currentAnnotation = $('<div class="annotation"></div>').css({
+        var container = $('<div id="annotate-' + self.currentId + '" class="annotate-container"></div>');
+        self.currentAnnotation = $('<div class="annotate-annotation"></div>').css({
             width:        '1px',
             height:       '1px',
-            borderStyle:  self.settings.annotationBorderStyle,
-            borderWidth:  self.settings.annotationBorderWidth + 'px',
-            borderColor:  self.settings.annotationBorderColor,
             position:     'absolute',
             left:         e.pageX,
             top:          e.pageY,
@@ -96,6 +86,8 @@
         })
         .appendTo(container);
         container.appendTo(self.container);
+
+        self.annotationBorderWidth = (self.currentAnnotation.outerWidth()-self.currentAnnotation.width())/2;
         self.originalCoords = { top: e.pageY, left: e.pageX };
     }
 
@@ -121,7 +113,7 @@
         if (!self.currentAnnotation)
             return;
 
-        var container = self.currentAnnotation.closest('.feedback-container');
+        var container = self.currentAnnotation.closest('.annotate-container');
         var coords = self.getCoordinates(self.currentAnnotation);
 
         self.fadeInForm();
@@ -132,23 +124,20 @@
             return;
         }
 
-        var closerHeight = 10;
-        var closerWidth  = 10;
-
-        var closer = $('<a>X</a>').css({
-            display:     'block',
-            width:       closerHeight + 'px',
-            height:      closerWidth + 'px',
-            position:    'absolute',
-            border:      '1px solid #aaa',
-            background:  'yellow',
-            padding:     '3px',
-            top:         (coords.top-(closerHeight/2)),
-            left:        (coords.right-(closerWidth/2)),
-            zIndex:      self.settings.overlayZIndex + 2
+        var closer = $('<a class="annotate-close-link">X</a>').css({
+            display:      'block',
+            position:     'absolute',
+            textAlign:     'center',
+            verticalAlign: 'middle',
+            zIndex:        self.settings.overlayZIndex + 2
         })
         .bind('click', self.onClickClose)
         .appendTo(container);
+
+        closer.css({
+            top:  coords.top-(closer.outerHeight()/2)+(self.annotationBorderWidth/2),
+            left: coords.right-(closer.outerWidth()/2)+(self.annotationBorderWidth/2),
+        });
 
         var commentWidth   = self.currentAnnotation.width();
         var commentHeight  = self.currentAnnotation.height();
@@ -163,9 +152,8 @@
         var currentComment = $('<div></div>').css({
             width:       commentWidth + 'px',
             height:      commentHeight + 'px',
-            borderStyle: self.settings.annotationBorderStyle,
-            borderWidth: self.settings.annotationBorderWidth,
-            borderColor: self.settings.annotationBorderColor,
+            margin:      self.annotationBorderWidth,
+            border:      '0',
             position:    'absolute',
             left:        commentLeft,
             top:         commentTop,
@@ -216,7 +204,7 @@
         if (!self.lastComment)
             return;
         var textarea = self.lastComment.find('textarea');
-        var annotation = self.lastComment.closest('.feedback-container').find('.annotation');
+        var annotation = self.lastComment.closest('.annotate-container').find('.annotate-annotation');
         var text = textarea.val();
         self.lastComment.remove();
         self.lastComment = null;
@@ -227,21 +215,21 @@
         if (!text)
             return;
 
-        var container = annotation.closest('.feedback-container');
+        var container = annotation.closest('.annotate-container');
         var coords = self.getCoordinates(annotation);
 
-        var padding = 5;
-        var comment = $('<div></div>').css({
+        var comment = $('<div class="annotate-comment"></div>').css({
             position:   'absolute',
-            top:        coords.bottom + (self.settings.annotationBorderWidth*2),
-            left:       coords.left,
-            width:      annotation.width() + (self.settings.annotationBorderWidth*2) - (padding*2),
-            background: 'white',
-            padding:    padding + 'px',
-            zIndex:     self.settings.overlayZIndex + 1
+            top:         coords.bottom + (self.annotationBorderWidth*2),
+            left:        coords.left,
+            zIndex:      self.settings.overlayZIndex + 1
         })
         .html(text)
         .appendTo(container);
+
+        comment.css({
+            width: annotation.outerWidth() - (comment.outerWidth()-comment.width())
+        });
     }
 
     self.checkAnnotationSize = function(coords) {
@@ -253,7 +241,7 @@
     }
 
     self.onClickClose = function(e) {
-        var container = $(e.currentTarget).closest('.feedback-container');
+        var container = $(e.currentTarget).closest('.annotate-container');
         container.remove();
     }
 
