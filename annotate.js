@@ -7,48 +7,38 @@
 
     self.settings = $.extend({
         annotationMinimumSize:  10,
-        collectHtml:            true,
         formId:                 null,
-        formFadeDuration:       200,
-        callback:               null
+        formFadeDuration:       200
     }, settings);
 
-    self.main = function() {
+    self.start = function() {
         self.reset();
-
-        // todo: move some of this to reset() maybe?
         self.container = $('<div></div>').appendTo('body');
-        self.originalCoords       = { top: 0, left: 0 };
-        self.currentAnnotation    = null;
-        self.currentId            = 0;
-        self.isFormFaded          = false;
-
         self.createOverlay(self.container);
         self.initOverlayEventHandlers();
         self.initializeForm();
     }
 
-    self.commit = function() {
-        var data = self.collectInformation();
-        self.reset();
-        if (self.settings.callback)
-            self.settings.callback(data);
+    self.reset = function() {
+        if (self.container) {
+            self.container.remove();
+            self.container = null;
+        }
+        self.startCoordinates     = { top: 0, left: 0 };
+        self.currentAnnotation    = null;
+        self.currentId            = 0;
+        self.isFormFaded          = false;
     }
 
-    self.cancel = function() {
-        self.reset();
+    self.getHtml = function() {
+        self.setExplicitWidths();
+        var html = '<html>' + $('html').html() + '</html>';
+        self.rollbackExplicitWidths();
+        return html;
     }
 
 
     // =================================================================
-
-
-    self.reset = function() {
-        if (!self.container)
-            return;
-        self.container.remove();
-        self.container = null;
-    }
 
 
     self.createOverlay = function(container) {
@@ -59,7 +49,6 @@
             height:           '100%',
             left:             '0',
             top:              '0',
-            //zIndex:           self.overlayZIndex,
             textAlign:        'center'
         })
         .appendTo(container);
@@ -92,7 +81,7 @@
         container.appendTo(self.container);
 
         self.annotationBorderWidth = (self.currentAnnotation.outerWidth()-self.currentAnnotation.width())/2;
-        self.originalCoords = { top: e.pageY, left: e.pageX };
+        self.startCoordinates = { top: e.pageY, left: e.pageX };
     }
 
     self.onOverlayMouseMove = function(e) {
@@ -101,13 +90,13 @@
 
         var newCoords = { top: e.pageY, left: e.pageX };
 
-        if (newCoords.top < self.originalCoords.top) 
+        if (newCoords.top < self.startCoordinates.top) 
             self.currentAnnotation.css('top', newCoords.top);
-        if (newCoords.left < self.originalCoords.left) 
+        if (newCoords.left < self.startCoordinates.left) 
             self.currentAnnotation.css('left', newCoords.left);
 
-        self.currentAnnotation.height(Math.abs(newCoords.top - self.originalCoords.top));
-        self.currentAnnotation.width(Math.abs(newCoords.left - self.originalCoords.left));
+        self.currentAnnotation.height(Math.abs(newCoords.top - self.startCoordinates.top));
+        self.currentAnnotation.width(Math.abs(newCoords.left - self.startCoordinates.left));
 
         if (self.checkAnnotationSize(self.getCoordinates(self.currentAnnotation)))
             self.fadeOutForm();
@@ -248,8 +237,7 @@
         container.remove();
     }
 
-    self.collectHtml = function() {
-
+    self.setExplicitWidths = function() {
         $('*').each(function () {
             if ($(this).attr('style'))
                 $(this).data('oldStyle', $(this).attr('style'));
@@ -258,28 +246,15 @@
             $(this).width($(this).width());
             $(this).height($(this).height());
         });
+    }
 
-        var html = '<html>' + $('html').html() + '</html>';
-
+    self.rollbackExplicitWidths = function() {
         $('*').each(function () {
             if ($(this).data('oldStyle') != 'none')
                 $(this).attr('style', $(this).data('oldStyle'));
             else
                 $(this).removeAttr('style');
         });
-
-        return html;
-
-    }
-
-    self.collectInformation = function() {
-        var data = {
-            url:       document.URL,
-            userAgent: navigator.userAgent,
-        };
-        if (self.settings.collectHtml)
-            data.html = self.collectHtml();
-        return data;
     }
 
 }

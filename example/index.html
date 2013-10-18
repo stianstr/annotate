@@ -6,15 +6,11 @@
   <script type="text/javascript">
     $(function() {
         var annotate = new Annotate({
-            formId: 'annotate-form',
-            callback: function(data) {
-                console.log('callback.data: ', data);
-            }
+            formId: 'annotate-form'
         }); 
-        annotate.main();
-        $('#annotate-start').on('click',  function() { annotate.main(); });
-        $('#annotate-commit').on('click', function() { annotate.commit(); });
-        $('#annotate-cancel').on('click', function() { annotate.cancel(); });
+        $('#annotate-start').on('click',  function() { annotate.start(); });
+        $('#annotate-commit').on('click', function() { console.log('data:',annotate.getHtml()); annotate.reset(); });
+        $('#annotate-cancel').on('click', function() { annotate.reset(); });
     });
   </script>
   <link rel="stylesheet" type="text/css" href="../annotate.css"> 
