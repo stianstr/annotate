@@ -6,7 +6,6 @@
     self.leftMouseButton = 1;
 
     self.settings = $.extend({
-        overlayZIndex:          '9000000',
         annotationMinimumSize:  10,
         collectHtml:            true,
         formId:                 null,
@@ -17,20 +16,16 @@
     self.main = function() {
         self.reset();
 
+        // todo: move some of this to reset() maybe?
         self.container = $('<div></div>').appendTo('body');
         self.originalCoords       = { top: 0, left: 0 };
         self.currentAnnotation    = null;
         self.currentId            = 0;
         self.isFormFaded          = false;
-        self.form                 = self.initializeForm();
 
         self.createOverlay(self.container);
-
-        self.overlay.bind('mousedown', self.onOverlayMouseDown);
-        self.overlay.bind('mousemove', self.onOverlayMouseMove);
-        self.overlay.bind('mouseup',   self.onOverlayMouseUp);
-
-        self.overlay.height($(document).height());
+        self.initOverlayEventHandlers();
+        self.initializeForm();
     }
 
     self.commit = function() {
@@ -46,6 +41,7 @@
 
 
     // =================================================================
+
 
     self.reset = function() {
         if (!self.container)
@@ -63,10 +59,18 @@
             height:           '100%',
             left:             '0',
             top:              '0',
-            zIndex:           self.settings.overlayZIndex,
+            //zIndex:           self.overlayZIndex,
             textAlign:        'center'
         })
         .appendTo(container);
+        self.overlay.height($(document).height());
+        self.overlayZIndex = self.overlay.css('zIndex');
+    }
+
+    self.initOverlayEventHandlers = function() {
+        self.overlay.bind('mousedown', self.onOverlayMouseDown);
+        self.overlay.bind('mousemove', self.onOverlayMouseMove);
+        self.overlay.bind('mouseup',   self.onOverlayMouseUp);
     }
 
     self.onOverlayMouseDown = function(e) {
@@ -82,7 +86,7 @@
             position:     'absolute',
             left:         e.pageX,
             top:          e.pageY,
-            zIndex:       self.settings.overlayZIndex - 1
+            zIndex:       self.overlayZIndex - 1
         })
         .appendTo(container);
         container.appendTo(self.container);
@@ -129,7 +133,7 @@
             position:     'absolute',
             textAlign:     'center',
             verticalAlign: 'middle',
-            zIndex:        self.settings.overlayZIndex + 2
+            zIndex:        self.overlayZIndex + 2
         })
         .bind('click', self.onClickClose)
         .appendTo(container);
@@ -158,7 +162,7 @@
             left:        commentLeft,
             top:         commentTop,
             background:  'white',
-            zIndex:      self.settings.overlayZIndex + 1
+            zIndex:      self.overlayZIndex + 1
         })
         .append(textArea)
         .appendTo(container);
@@ -170,13 +174,12 @@
     }
 
     self.initializeForm = function() {
-        var form = (self.settings.formId) ? $('#'+self.settings.formId) : null;
-        if (!form)
+        self.form = (self.settings.formId) ? $('#'+self.settings.formId) : null;
+        if (!self.form)
             return;
-        form.css({
-            zIndex: self.settings.overlayZIndex + 1
+        self.form.css({
+            zIndex: self.overlayZIndex + 1
         });
-        return form;
     }
 
     self.fadeOutForm = function() {
@@ -222,7 +225,7 @@
             position:   'absolute',
             top:         coords.bottom + (self.annotationBorderWidth*2),
             left:        coords.left,
-            zIndex:      self.settings.overlayZIndex + 1
+            zIndex:      self.overlayZIndex + 1
         })
         .html(text)
         .appendTo(container);

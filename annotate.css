@@ -1,6 +1,7 @@
 .annotate-overlay {
   background: #000;
   opacity: 0.2;
+  z-index: 9000000;
 }
 .annotate-annotation {
   border-style: solid;
