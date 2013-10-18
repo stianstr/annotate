@@ -27,12 +27,27 @@
      border-right: 0; 
      padding: 5px;
    }
+   .get-started {
+     float: right;
+     padding: 10px;
+     background: yellow;
+     border: 1px solid black;
+   }
+   .get-started .arrow {
+     font-size: 40px;
+     font-weight: bold;
+     text-align: center;
+   }
   </style>
 </head>
 <body>
 
     <h1>Sample page - annotate.js</h1>
-    <p>Click "Start", then press mouse and draw a rectangle</p>
+    <p>Annotate.js lets you highlight portions of a page and annotate them with comments</p>
+    <div class="get-started">
+     <div class="arrow">&uarr;</div>
+     Click <b>Start</b>, then press mouse and draw rectangles
+    </div>
 
     <div id="annotate-form">
         <a id="annotate-start"  href="#">Start</a>
