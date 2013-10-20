@@ -1,7 +1,9 @@
 .annotate-overlay {
+  z-index: 9000000;
+/*
   background: #000;
   opacity: 0.2;
-  z-index: 9000000;
+*/
 }
 .annotate-annotation {
   border-style: solid;
@@ -23,12 +25,21 @@
   border-width: 2px;
   border-radius: 10px;
   font-size: 11px;
+  line-height: 12px;
   padding: 3px;
   height: 12px;
   width: 12px;
+  text-decoration: none;
 }
 .annotate-close-link:hover {
   pointer: cursor;
   background: #ff0000;
   color: white;
+  text-decoration: none;
 }
+.annotate-edit-comment textarea {
+    resize: none;
+    border: 0;
+    padding: 5px;
+}
+

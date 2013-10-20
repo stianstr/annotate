@@ -5,55 +5,63 @@
   <script src="../annotate.js" type="text/javascript"></script>
   <script type="text/javascript">
     $(function() {
-        var annotate = new Annotate({
-            formId: 'annotate-form'
-        }); 
-        $('#annotate-start').on('click',  function() { annotate.start(); });
-        $('#annotate-commit').on('click', function() { console.log('data:',annotate.getHtml()); annotate.reset(); });
-        $('#annotate-cancel').on('click', function() { annotate.reset(); });
+        var annotate = new Annotate();
+        annotate.on('enabled', function(options) {
+            $('#annotate-form').css({ zIndex: options.zIndex+2 });
+            $('#annotate-indicator').html('Enabled');
+        });
+        annotate.on('disabled', function() {
+            $('#annotate-indicator').html('Disabled');
+        });
+        annotate.on('draw', function() {
+            $('#annotate-form').fadeOut(200);
+        });
+        annotate.on('drawn', function() {
+            $('#annotate-form').fadeIn(200);
+        });
+        $('#annotate-enable').on('click',  function() { annotate.enable(); });
+        $('#annotate-disable').on('click',  function() { annotate.disable(); });
+        $('#annotate-reset').on('click', function() { annotate.reset(); });
     });
   </script>
   <link rel="stylesheet" type="text/css" href="../annotate.css"> 
   <style type="text/css">
    #annotate-form {
+     background: #25a;
      position: absolute;
-     right: 0;
-     top: 0;
-     height: 20px;
-     width: 200px;
-     background: #b0e0ff;
-     border: 1px solid #25a;
-     border-top: 0; 
-     border-right: 0; 
-     padding: 5px;
-   }
-   .get-started {
-     float: right;
+     top: 0px;
+     right: 0px;
      padding: 10px;
-     background: yellow;
-     border: 1px solid black;
    }
-   .get-started .arrow {
-     font-size: 40px;
+   #annotate-indicator {
      font-weight: bold;
-     text-align: center;
+     text-transform: uppercase;
+     position: absolute;
+     top: 35px;
+     right: 0px;
+     padding: 10px;
+   }
+   #annotate-form a {
+     padding: 5px;
+     color: white;
+     cursor: pointer;
    }
   </style>
 </head>
 <body>
 
-    <h1>Sample page - annotate.js</h1>
-    <p>Annotate.js lets you highlight portions of a page and annotate them with comments</p>
-    <div class="get-started">
-     <div class="arrow">&uarr;</div>
-     Click <b>Start</b>, then press mouse and draw rectangles
+    <div id="contents">
+        <h1>Sample page - annotate.js</h1>
+        <p>Annotate.js lets you highlight portions of a page and annotate them with comments</p>
+        <p>Click ENABLE in the top right menu and start drawing rectangles</p>
     </div>
 
     <div id="annotate-form">
-        <a id="annotate-start"  href="#">Start</a>
-        <a id="annotate-commit" href="#">Commit</a>
-        <a id="annotate-cancel" href="#">Cancel</a>
+      <a id="annotate-enable">Enable</a>
+      <a id="annotate-disable">Disable</a>
+      <a id="annotate-reset">Reset</a>
     </div>
+    <div id="annotate-indicator">Disabled</a>
 
 </body>
 </html>

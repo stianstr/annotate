@@ -2,21 +2,35 @@
 
     var $                = jQuery;
     var self             = this;
-
+    self.settings        = $.extend({ annotationMinimumSize:  10 }, settings);
     self.leftMouseButton = 1;
+    self.eventHandlers   = {};
 
-    self.settings = $.extend({
-        annotationMinimumSize:  10,
-        formId:                 null,
-        formFadeDuration:       200
-    }, settings);
-
-    self.start = function() {
-        self.reset();
-        self.container = $('<div></div>').appendTo('body');
+    self.enable = function() {
+        if (!self.container) {
+            self.reset();
+            self.container = $('<div></div>').appendTo('body');
+        }
         self.createOverlay(self.container);
-        self.initOverlayEventHandlers();
-        self.initializeForm();
+        self.enableOverlayEventHandlers();
+        $('.annotate-close-link').show();
+        self.triggerEvent('enabled', {
+            zIndex: self.overlayZIndex
+        });
+    }
+
+    self.disable = function() {
+        self.overlay.remove();
+        self.overlay = null;
+        $('.annotate-close-link').hide();
+        self.triggerEvent('disabled');
+    }
+
+    self.toggle = function() {
+        if (self.overlay)
+            self.disable();
+        else
+            self.enable();
     }
 
     self.reset = function() {
@@ -27,7 +41,7 @@
         self.startCoordinates     = { top: 0, left: 0 };
         self.currentAnnotation    = null;
         self.currentId            = 0;
-        self.isFormFaded          = false;
+        self.triggerEvent('reset');
     }
 
     self.getHtml = function() {
@@ -37,9 +51,23 @@
         return html;
     }
 
+    self.on = function(event, callback) {
+        if (!self.eventHandlers[event])
+            self.eventHandlers[event] = [];
+        self.eventHandlers[event][self.eventHandlers[event].length] = callback;
+    }
+
 
     // =================================================================
 
+
+    self.triggerEvent = function(event, data) {
+        if (!self.eventHandlers[event])
+            return;
+        for(var i=0; i < self.eventHandlers[event].length; i++) {
+            self.eventHandlers[event][i](data);
+        }
+    }
 
     self.createOverlay = function(container) {
         self.overlay = $('<div class="annotate-overlay"></div>')
@@ -56,10 +84,16 @@
         self.overlayZIndex = self.overlay.css('zIndex');
     }
 
-    self.initOverlayEventHandlers = function() {
+    self.enableOverlayEventHandlers = function() {
         self.overlay.bind('mousedown', self.onOverlayMouseDown);
         self.overlay.bind('mousemove', self.onOverlayMouseMove);
         self.overlay.bind('mouseup',   self.onOverlayMouseUp);
+    }
+
+    self.disableOverlayEventHandlers = function() {
+        self.overlay.unbind('mousedown', self.onOverlayMouseDown);
+        self.overlay.unbind('mousemove', self.onOverlayMouseMove);
+        self.overlay.unbind('mouseup',   self.onOverlayMouseUp);
     }
 
     self.onOverlayMouseDown = function(e) {
@@ -99,7 +133,7 @@
         self.currentAnnotation.width(Math.abs(newCoords.left - self.startCoordinates.left));
 
         if (self.checkAnnotationSize(self.getCoordinates(self.currentAnnotation)))
-            self.fadeOutForm();
+            self.triggerEvent('draw');
     }
 
     self.onOverlayMouseUp = function(e) {
@@ -108,8 +142,6 @@
 
         var container = self.currentAnnotation.closest('.annotate-container');
         var coords = self.getCoordinates(self.currentAnnotation);
-
-        self.fadeInForm();
 
         if (!self.checkAnnotationSize(coords)) {
             container.remove();
@@ -137,12 +169,15 @@
         var commentTop     = coords.top;
         var commentLeft    = coords.left;
 
+        var textAreaPadding = 5;
         var textArea = $('<textarea placeholder="Enter comment..."></textarea>').css({
             border:  '0',
-            width:   (commentWidth) + 'px',
-            height:  (commentHeight) + 'px',
+            borderRadius: '0',
+            padding: textAreaPadding + 'px',
+            width:   (commentWidth-(textAreaPadding*0)) + 'px',
+            height:  (commentHeight-(textAreaPadding*0)) + 'px'
         });
-        var currentComment = $('<div></div>').css({
+        var currentComment = $('<div class="annotate-edit-comment"></div>').css({
             width:       commentWidth + 'px',
             height:      commentHeight + 'px',
             margin:      self.annotationBorderWidth,
@@ -157,32 +192,11 @@
         .appendTo(container);
 
         textArea.focus();
+
         self.currentAnnotation = null;
-
         self.lastComment = currentComment;
-    }
 
-    self.initializeForm = function() {
-        self.form = (self.settings.formId) ? $('#'+self.settings.formId) : null;
-        if (!self.form)
-            return;
-        self.form.css({
-            zIndex: self.overlayZIndex + 1
-        });
-    }
-
-    self.fadeOutForm = function() {
-        if (!self.settings.formId || self.isFormFaded)
-            return;
-        self.isFormFaded = true;
-        self.form.fadeOut(self.settings.formFadeDuration);
-    }
-
-    self.fadeInForm = function() {
-        if (!self.settings.formId || !self.isFormFaded)
-            return;
-        self.isFormFaded = false;
-        self.form.fadeIn(self.settings.formFadeDuration);
+        self.triggerEvent('drawn');
     }
 
     self.getCoordinates = function(highlight) {
