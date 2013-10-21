@@ -20,6 +20,8 @@
     }
 
     self.disable = function() {
+        if (!self.overlay)
+            return;
         self.overlay.remove();
         self.overlay = null;
         $('.annotate-close-link').hide();
@@ -174,8 +176,8 @@
             border:  '0',
             borderRadius: '0',
             padding: textAreaPadding + 'px',
-            width:   (commentWidth-(textAreaPadding*0)) + 'px',
-            height:  (commentHeight-(textAreaPadding*0)) + 'px'
+            width:   (commentWidth-(textAreaPadding*2)) + 'px',
+            height:  (commentHeight-(textAreaPadding*2)) + 'px'
         });
         var currentComment = $('<div class="annotate-edit-comment"></div>').css({
             width:       commentWidth + 'px',
@@ -239,11 +241,7 @@
     }
 
     self.checkAnnotationSize = function(coords) {
-        if ( (coords.bottom-coords.top) < self.settings.annotationMinimumSize )
-            return false;
-        if ( (coords.right-coords.left) < self.settings.annotationMinimumSize )
-            return false;
-        return true;
+        return ( (coords.bottom-coords.top) >= self.settings.annotationMinimumSize || (coords.right-coords.left) >= self.settings.annotationMinimumSize );
     }
 
     self.onClickClose = function(e) {
