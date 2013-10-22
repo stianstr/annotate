@@ -46,13 +46,6 @@
         self.triggerEvent('reset');
     }
 
-    self.getHtml = function() {
-        self.setExplicitWidths();
-        var html = '<html>' + $('html').html() + '</html>';
-        self.rollbackExplicitWidths();
-        return html;
-    }
-
     self.on = function(event, callback) {
         if (!self.eventHandlers[event])
             self.eventHandlers[event] = [];
@@ -247,26 +240,6 @@
     self.onClickClose = function(e) {
         var container = $(e.currentTarget).closest('.annotate-container');
         container.remove();
-    }
-
-    self.setExplicitWidths = function() {
-        $('*').each(function () {
-            if ($(this).attr('style'))
-                $(this).data('oldStyle', $(this).attr('style'));
-            else
-                $(this).data('oldStyle', 'none');
-            $(this).width($(this).width());
-            $(this).height($(this).height());
-        });
-    }
-
-    self.rollbackExplicitWidths = function() {
-        $('*').each(function () {
-            if ($(this).data('oldStyle') != 'none')
-                $(this).attr('style', $(this).data('oldStyle'));
-            else
-                $(this).removeAttr('style');
-        });
     }
 
 }
