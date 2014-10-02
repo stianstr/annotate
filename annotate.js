@@ -22,6 +22,7 @@
     self.disable = function() {
         if (!self.overlay)
             return;
+		self.processLastComment();
         self.overlay.remove();
         self.overlay = null;
         $('.annotate-close-link').hide();
