@@ -53,6 +53,16 @@
         self.eventHandlers[event][self.eventHandlers[event].length] = callback;
     }
 
+	self.getTexts = function() {
+		var result = [];
+		$('.annotate-container .annotate-comment').each(function(n, elem) {
+			var html = $(elem).html().trim();
+			if (html)
+				result[result.length] = html;
+		});
+		return result;
+	}
+
 
     // =================================================================
 

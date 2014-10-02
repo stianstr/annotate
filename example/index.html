@@ -23,6 +23,7 @@
         $('#annotate-enable').on('click',  function() { annotate.enable(); });
         $('#annotate-disable').on('click',  function() { annotate.disable(); });
         $('#annotate-reset').on('click', function() { annotate.reset(); });
+        $('#annotate-texts').on('click', function() { console.log('Annotate Texts: ', annotate.getTexts()); });
     });
   </script>
   <link rel="stylesheet" type="text/css" href="../annotate.css"> 
@@ -61,6 +62,7 @@
       <a id="annotate-enable">Enable</a>
       <a id="annotate-disable">Disable</a>
       <a id="annotate-reset">Reset</a>
+      <a id="annotate-texts">Log texts to console</a>
     </div>
     <div id="annotate-indicator">Disabled</a>
 
