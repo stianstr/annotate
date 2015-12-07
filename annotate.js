@@ -6,6 +6,14 @@
     self.leftMouseButton = 1;
     self.eventHandlers   = {};
 
+	self.settings.text = $.extend({
+		EnterComment: 'Enter comment...'
+	}, settings.text ? settings.text : {});
+
+    self.text = function(text) {
+        return self.settings.texts[text];
+    }
+
     self.enable = function() {
         if (!self.container) {
             self.reset();
@@ -176,7 +184,7 @@
         var commentLeft    = coords.left;
 
         var textAreaPadding = 5;
-        var textArea = $('<textarea placeholder="Enter comment..."></textarea>').css({
+        var textArea = $('<textarea placeholder="' + self.text('EnterComment') + '"></textarea>').css({
             border:  '0',
             borderRadius: '0',
             padding: textAreaPadding + 'px',
